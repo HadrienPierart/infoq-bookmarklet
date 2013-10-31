@@ -2,6 +2,7 @@
 // Injecter automatiquemenet le titre
 // Injecter automatiquement la source
 // Injecter automatiquement l'auteur
+// FIXME : image avec un click to enlarge semble buggée. Voir le dom associé.
 
 (function () {
         if (document.URL.indexOf('www.infoq.com/') !== -1 || window.location.href.indexOf('www.infoq.com/') !== -1) {
