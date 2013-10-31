@@ -68,7 +68,7 @@
 
                 htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
 
-                var value = toMarkdown(htmlToParse.split('<div class="random_links">')[0]).replace(/&nbsp;/g, " ");
+                var value = toMarkdown(htmlToParse.split('<div class="random_links">')[0]);
                 textarea.val(value);
             }
 
