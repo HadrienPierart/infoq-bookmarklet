@@ -1,7 +1,4 @@
-// TODO : gérer la gestion des Tags de pied d'article
-// Injecter automatiquemenet le titre
 // Injecter automatiquement la source
-// Injecter automatiquement l'auteur
 // FIXME : image avec un click to enlarge semble buggée. Voir le dom associé.
 
 (function () {
@@ -12,6 +9,12 @@
         }
 
         function execute() {
+
+            var templates = {
+                news: "\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Summary (max 400 chars): ${summary}\n\n---------------------------------------\n\n",
+                article: "\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Short Summary (200 chars max): ${summaryShort}\n* Summary (max 400 chars) : ${summary}\n\n---------------------------------------\n\n"
+            };
+
             if (!($ = window.jQuery)) {
                 var jqScript = document.createElement('script');
                 jqScript.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
@@ -69,7 +72,25 @@
 
                 htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
 
-                var value = toMarkdown(htmlToParse.split('<div class="random_links">')[0]);
+                var template = "";
+                if(document.URL.indexOf('www.infoq.com/news')!==-1){
+                    template = templates.news;
+                } else if(document.URL.indexOf('www.infoq.com/article')!==-1){
+                    template = templates.news;
+                }
+
+                var topics = [];
+                $('.random_links ul li').each(function(idx, ele){ topics.push($(ele).text()); });
+                topics = topics.slice(topics.indexOf('Topics') + 1);
+
+                var value = template
+                    .replace(/\$\{title\}/g, document.title)
+                    .replace(/\$\{topics\}/g, '\n    - ' + topics.join('\n    - ') + '\n')
+                    .replace(/\$\{summary\}/g, $('meta[name=description]').attr("content"));
+
+                value += toMarkdown(htmlToParse.split('<div class="random_links">')[0]);
+
+
                 textarea.val(value);
             }
 
