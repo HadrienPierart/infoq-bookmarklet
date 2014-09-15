@@ -2,6 +2,7 @@
 // FIXME : image avec un click to enlarge semble buggée. Voir le dom associé.
 
 (function () {
+  "use strict";
         if (document.URL.indexOf('www.infoq.com/') !== -1 || window.location.href.indexOf('www.infoq.com/') !== -1) {
             execute();
         } else {
@@ -47,9 +48,13 @@
 
                 if (typeof h2m === 'undefined') {
                     var script = document.createElement('script');
-                    script.src = 'https://rawgithub.com/domchristie/to-markdown/master/src/to-markdown.js';
-                    script.onload = offWeGo;
+                    script.src = 'https://raw.githubusercontent.com/mathiasbynens/he/master/he.js';
                     document.body.appendChild(script);
+
+                  var script2 = document.createElement('script');
+                    script2.src = 'https://raw.githubusercontent.com/domchristie/to-markdown/master/src/to-markdown.js';
+                    script2.onload = offWeGo;
+                    document.body.appendChild(script2);
                 } else {
                     offWeGo();
                 }
