@@ -52,7 +52,7 @@
         document.body.appendChild(script);
 
         var script2 = document.createElement('script');
-        script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v1.0.0-rc.1/dist/to-markdown.js';
+        script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v0.0.3/src/to-markdown.js';
         script2.onload = offWeGo;
         document.body.appendChild(script2);
       } else {
@@ -82,6 +82,8 @@
 
       htmlToParse = htmlToParse
           .replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/\u00a0/g, ' ')
           .replace(/(<pre\b[^>]*>)/g, '$1\n')
           .replace(/(<\/pre>)/g, '\n$1'); // add spaces around pre content to avoid bug in markdown lib
 
