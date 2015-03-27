@@ -61,7 +61,7 @@
     }
 
     function offWeGo() {
-      var mdCopyPaste = $('<div id="markdownRendered"><textarea id="mdToCopy" cols="80" rows="40" style="display: block; margin: auto; padding: 10px;"></textarea></div>');
+      var mdCopyPaste = $('<div id="markdownRendered"><textarea id="mdToCopy" cols="80" rows="40" style="display: block; margin: auto; padding: 10px;"></textarea><button onclick="saveTextAsFile()">Download to file</button></div>');
       mdCopyPaste.appendTo('body');
 
       var $markdownRendered = $('#markdownRendered');
@@ -75,7 +75,10 @@
           .find('.clear').remove().end()
           .find('#lowerFullwidthVCR').remove().end().html();
 
-      htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
+      htmlToParse = htmlToParse
+          .replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2')
+          .replace(/(<pre\b[^>]*>)/g, '$1\n')
+          .replace(/(<\/pre>)/g, '\n$1'); // add spaces around pre content to avoid bug in markdown lib
 
       var template = "";
       if(document.URL.indexOf('www.infoq.com/news')!==-1){
@@ -99,6 +102,31 @@
       textarea.val(value);
     }
 
+    window.saveTextAsFile = function () {
+      var textToWrite = document.getElementById("mdToCopy").value;
+      var textFileAsBlob = new Blob([textToWrite], {type: 'text/plain'});
+      var urlPath = window.location.pathname.split('/');
+      var fileNameToSaveAs = urlPath[urlPath.length - 1] + '.md';
+
+      var downloadLink = document.createElement("a");
+      downloadLink.download = fileNameToSaveAs;
+      downloadLink.innerHTML = "Download File";
+      if (window.webkitURL != null) {
+        // Chrome allows the link to be clicked
+        // without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+      }
+      else {
+        // Firefox requires the link to be added to the DOM
+        // before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+      }
+
+      downloadLink.click();
+    }
 
   }
 })();
