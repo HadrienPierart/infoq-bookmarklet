@@ -52,7 +52,7 @@
         document.body.appendChild(script);
 
         var script2 = document.createElement('script');
-        script2.src = 'https://rawgit.com/domchristie/to-markdown/master/src/to-markdown.js';
+        script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v1.0.0-rc.1/dist/to-markdown.js';
         script2.onload = offWeGo;
         document.body.appendChild(script2);
       } else {
@@ -61,7 +61,12 @@
     }
 
     function offWeGo() {
-      var mdCopyPaste = $('<div id="markdownRendered"><textarea id="mdToCopy" cols="80" rows="40" style="display: block; margin: auto; padding: 10px;"></textarea><button onclick="saveTextAsFile()">Download to file</button></div>');
+      var buttonStyles = 'position: absolute; top: 10px; left: 6px; text-align: center; background: #3498db; background-image: linear-gradient(to bottom, #3498db, #2980b9); border-radius: 10px; box-shadow: 2px 2px 2px #666666; font-family: Arial; color: #ffffff; font-size: 18px; padding: 5px 13px; border: solid #1f628d 2px; text-decoration: none; cursor:pointer;';
+
+      var mdCopyPaste = $('<div id="markdownRendered">' +
+          '<textarea id="mdToCopy" cols="80" rows="40" style="display: block; margin: auto; padding: 10px;"></textarea>' +
+          '<button onclick="saveTextAsFile()" style="'+buttonStyles+'">Download</button>' +
+      '</div>');
       mdCopyPaste.appendTo('body');
 
       var $markdownRendered = $('#markdownRendered');
@@ -98,7 +103,7 @@
 
       value += toMarkdown(htmlToParse.split('<div class="random_links">')[0]);
 
-
+      $('.ui-dialog').zIndex(10000);
       textarea.val(value);
     }
 
@@ -120,7 +125,7 @@
         // Firefox requires the link to be added to the DOM
         // before it can be clicked.
         downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-        downloadLink.onclick = destroyClickedElement;
+        downloadLink.onclick = function (evt) { document.body.removeChild(evt.target) };
         downloadLink.style.display = "none";
         document.body.appendChild(downloadLink);
       }
