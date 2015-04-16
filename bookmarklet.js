@@ -1,6 +1,6 @@
 // Injecter automatiquement la source
 // FIXME : image avec un click to enlarge semble buggée. Voir le dom associé.
-
+// TODO ajouter un loader
 (function () {
   "use strict";
   if (document.URL.indexOf('www.infoq.com/') !== -1 || window.location.href.indexOf('www.infoq.com/') !== -1) {
@@ -48,13 +48,15 @@
 
       if (typeof h2m === 'undefined') {
         var script = document.createElement('script');
-        script.src = 'https://rawgit.com/mathiasbynens/he/master/he.js';
+        script.src = 'https://cdn.rawgit.com/mathiasbynens/he/v0.5.0/he.js';
+        script.onload = function() {
+          var script2 = document.createElement('script');
+          script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v0.0.3/src/to-markdown.js';
+          script2.onload = offWeGo;
+          document.body.appendChild(script2);
+        };
         document.body.appendChild(script);
 
-        var script2 = document.createElement('script');
-        script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v0.0.3/src/to-markdown.js';
-        script2.onload = offWeGo;
-        document.body.appendChild(script2);
       } else {
         offWeGo();
       }
@@ -80,12 +82,12 @@
           .find('.clear').remove().end()
           .find('#lowerFullwidthVCR').remove().end().html();
 
-      htmlToParse = htmlToParse
-          .replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/\u00a0/g, ' ')
-          .replace(/(<pre\b[^>]*>)/g, '$1\n')
-          .replace(/(<\/pre>)/g, '\n$1'); // add spaces around pre content to avoid bug in markdown lib
+      htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
+      htmlToParse = htmlToParse.replace(/&nbsp;/g, ' ');
+      htmlToParse = htmlToParse.replace(/\u00a0/g, ' ');
+      htmlToParse = htmlToParse.replace(/<pre\b[^>]*>([\w\W\s\S.]*?)<\/pre>/g, function (match, n1) {
+        return ('\n' + n1 + '\n').replace(/<span[\s\S]*?>/g, '').replace(/<\/span>/g, ''); // Removes nested span inside pre blocks
+      });
 
       var template = "";
       if(document.URL.indexOf('www.infoq.com/news')!==-1){
