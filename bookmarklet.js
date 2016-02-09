@@ -79,7 +79,10 @@
 
       var htmlToParse = $('.text_content_container>.text_info').clone();
       htmlToParse = htmlToParse.find('.related_sponsors').remove().end()
-          .find('.clear').remove().end()
+          .find('div').remove().end()
+          //.find('.clear').remove().end()//all clears are divs
+          .find('script').remove().end()
+          .find('iframe').remove().end()
           .find('#lowerFullwidthVCR').remove().end().html();
 
       htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
@@ -87,6 +90,7 @@
       htmlToParse = htmlToParse.replace(/\u00a0/g, ' ');
       htmlToParse = htmlToParse.replace(/<pre\b[^>]*>([\w\W\s\S.]*?)<\/pre>/g, function (match, n1) {
         return ('\n' + n1 + '\n').replace(/<span[\s\S]*?>/g, '').replace(/<\/span>/g, ''); // Removes nested span inside pre blocks
+      htmlToParse = htmlToParse.replace(/<!\-\-([\w\W\s\S.]*?)\-\->/g, '');
       });
 
       var template = "";
