@@ -18,7 +18,7 @@
 
     if (!($ = window.jQuery)) {
       var jqScript = document.createElement('script');
-      jqScript.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
+      jqScript.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
       jqScript.onload = loadJQui;
       document.body.appendChild(jqScript);
     }
@@ -29,14 +29,14 @@
     function loadJQui() {
       if (!(window.jQuery.ui)) {
         var jquiScript = document.createElement('script');
-        jquiScript.src = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+        jquiScript.src = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
         jquiScript.onload = loadMarkdownLib;
         document.body.appendChild(jquiScript);
 
         var fileref = document.createElement("link");
         fileref.setAttribute("rel", "stylesheet");
         fileref.setAttribute("type", "text/css");
-        fileref.setAttribute("href", 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css');
+        fileref.setAttribute("href", 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css');
         document.getElementsByTagName("head")[0].appendChild(fileref)
       }
       else {
