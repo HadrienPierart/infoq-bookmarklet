@@ -18,7 +18,7 @@
 
     if (!($ = window.jQuery)) {
       var jqScript = document.createElement('script');
-      jqScript.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
+      jqScript.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
       jqScript.onload = loadJQui;
       document.body.appendChild(jqScript);
     }
@@ -29,14 +29,14 @@
     function loadJQui() {
       if (!(window.jQuery.ui)) {
         var jquiScript = document.createElement('script');
-        jquiScript.src = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+        jquiScript.src = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
         jquiScript.onload = loadMarkdownLib;
         document.body.appendChild(jquiScript);
 
         var fileref = document.createElement("link");
         fileref.setAttribute("rel", "stylesheet");
         fileref.setAttribute("type", "text/css");
-        fileref.setAttribute("href", 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css');
+        fileref.setAttribute("href", 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css');
         document.getElementsByTagName("head")[0].appendChild(fileref)
       }
       else {
@@ -79,7 +79,10 @@
 
       var htmlToParse = $('.text_content_container>.text_info').clone();
       htmlToParse = htmlToParse.find('.related_sponsors').remove().end()
-          .find('.clear').remove().end()
+          .find('div').remove().end()
+          //.find('.clear').remove().end()//all clears are divs
+          .find('script').remove().end()
+          .find('iframe').remove().end()
           .find('#lowerFullwidthVCR').remove().end().html();
 
       htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
@@ -87,6 +90,7 @@
       htmlToParse = htmlToParse.replace(/\u00a0/g, ' ');
       htmlToParse = htmlToParse.replace(/<pre\b[^>]*>([\w\W\s\S.]*?)<\/pre>/g, function (match, n1) {
         return ('\n' + n1 + '\n').replace(/<span[\s\S]*?>/g, '').replace(/<\/span>/g, ''); // Removes nested span inside pre blocks
+      htmlToParse = htmlToParse.replace(/<!\-\-([\w\W\s\S.]*?)\-\->/g, '');
       });
 
       var template = "";
