@@ -3,6 +3,13 @@
 // TODO ajouter un loader
 (function () {
   "use strict";
+
+  var JQUERY = 'https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
+  var JQUERY_UI = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+  var JQUERY_UI_CSS = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css';
+  var HE_JS = 'https://cdn.rawgit.com/mathiasbynens/he/v0.5.0/he.js';
+  var TO_MARKDOWN = 'https://cdn.rawgit.com/domchristie/to-markdown/v0.0.3/src/to-markdown.js';
+
   if (document.URL.indexOf('www.infoq.com/') !== -1 || window.location.href.indexOf('www.infoq.com/') !== -1) {
     execute();
   } else {
@@ -10,15 +17,14 @@
   }
 
   function execute() {
-
     var templates = {
-      news: "\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Summary (max 400 chars): ${summary}\n\n---------------------------------------\n\n",
-      article: "\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Short Summary (200 chars max): ${summaryShort}\n* Summary (max 400 chars) : ${summary}\n\n---------------------------------------\n\n"
+      news: "\n* URL: ${original_url}\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Summary (max 400 chars): ${summary}\n\n---------------------------------------\n\n",
+      article: "\n* URL: ${original_url}\n* Title: ${title}\n* Translator:\n* Topics: ${topics}\n* Short Summary (200 chars max): ${summaryShort}\n* Summary (max 400 chars) : ${summary}\n\n---------------------------------------\n\n"
     };
 
     if (!($ = window.jQuery)) {
-      var jqScript = document.createElement('script');
-      jqScript.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
+      var jqScript    = document.createElement('script');
+      jqScript.src = JQUERY;
       jqScript.onload = loadJQui;
       document.body.appendChild(jqScript);
     }
@@ -29,14 +35,14 @@
     function loadJQui() {
       if (!(window.jQuery.ui)) {
         var jquiScript = document.createElement('script');
-        jquiScript.src = 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+        jquiScript.src = JQUERY_UI;
         jquiScript.onload = loadMarkdownLib;
         document.body.appendChild(jquiScript);
 
         var fileref = document.createElement("link");
         fileref.setAttribute("rel", "stylesheet");
         fileref.setAttribute("type", "text/css");
-        fileref.setAttribute("href", 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/vader/jquery-ui.css');
+        fileref.setAttribute("href", JQUERY_UI_CSS);
         document.getElementsByTagName("head")[0].appendChild(fileref)
       }
       else {
@@ -48,10 +54,10 @@
 
       if (typeof h2m === 'undefined') {
         var script = document.createElement('script');
-        script.src = 'https://cdn.rawgit.com/mathiasbynens/he/v0.5.0/he.js';
+        script.src = HE_JS;
         script.onload = function() {
           var script2 = document.createElement('script');
-          script2.src = 'https://cdn.rawgit.com/domchristie/to-markdown/v0.0.3/src/to-markdown.js';
+          script2.src = TO_MARKDOWN;
           script2.onload = offWeGo;
           document.body.appendChild(script2);
         };
@@ -77,12 +83,35 @@
 
       textarea.val('Converting...');
 
-      var htmlToParse = $('.text_content_container>.text_info').clone();
-      htmlToParse = htmlToParse.find('.related_sponsors').remove().end()
-          .find('.clear').remove().end()
-          .find('#lowerFullwidthVCR').remove().end().html();
+      var TO_CLEAN = [
+        'ul.sh_t',
+        '#topInfo',
+        '#header',
+        '.article_page_right',
+        '.related_sponsors',
+        '.comment_here',
+        '.bottomContent',
+        '.comments',
+        '.authModal',
+        '.clear',
+        '.follow__div',
+        '.overlay_comments',
+        '.all_comments',
+        '.popupLoginComments',
+        '#overlay_comments',
+        '#lowerFullwidthVCR',
+        '#responseContent',
+        '#footer',
+        'script'
+      ];
+      TO_CLEAN.forEach(function(it) {
+        $(it).remove()
+      });
 
-      htmlToParse = htmlToParse.replace(/img(.*?)src="(\/resource\/)/g, 'img$1src="http://www.infoq.com$2');
+      var htmlToParse = $('.text_content_container>.text_info').clone();
+      htmlToParse = htmlToParse.html();
+
+      htmlToParse = htmlToParse.replace(/<img(.*)src="(.*?)".*>/g, '<img src="$2"/>');
       htmlToParse = htmlToParse.replace(/&nbsp;/g, ' ');
       htmlToParse = htmlToParse.replace(/\u00a0/g, ' ');
       htmlToParse = htmlToParse.replace(/<pre\b[^>]*>([\w\W\s\S.]*?)<\/pre>/g, function (match, n1) {
@@ -97,15 +126,16 @@
       }
 
       var topics = [];
-      $('.random_links ul li').each(function(idx, ele){ topics.push($(ele).text()); });
-      topics = topics.slice(topics.indexOf('Topics') + 1);
+      $('.related__topics .follow__what').each(function(idx, ele){ topics.push($(ele).text()); });
 
       var value = template
           .replace(/\$\{title\}/g, document.title)
+          .replace(/\$\{original_url\}/g, window.location.href)
           .replace(/\$\{topics\}/g, '\n    - ' + topics.join('\n    - ') + '\n')
           .replace(/\$\{summary\}/g, $('meta[name=description]').attr("content"));
 
-      value += toMarkdown(htmlToParse.split('<div class="random_links">')[0]);
+      value += toMarkdown(htmlToParse.split('<div class="related">')[0]);
+      value = value.replace(/<!--[\S\s.]*?-->/, '');
 
       $('.ui-dialog').zIndex(10000);
       textarea.val(value);
